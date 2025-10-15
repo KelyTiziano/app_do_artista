@@ -1,42 +1,40 @@
-# Importamos os tipos de colunas que vamos usar no banco
-# Cada tipo define que tipo de dado será armazenado (texto, número, etc)
+# Import the column types we will use in the database
+# Each type defines what kind of data will be stored (text, number, etc)
 from sqlalchemy import Column, Integer, String, Boolean
 
-# Importamos o "Base" do arquivo database.py
-# Todos os modelos (tabelas) herdam dessa Base
+# Import the "Base" from the database.py file
+# All models (tables) inherit from this Base
 from database import Base
 
-# Criamos a classe que representa a tabela de obras de arte
+# Create the class that represents the artworks table
 class Artwork(Base):
-    # Nome da tabela no banco de dados
-    __tablename__ = "obras"
+    # Table name in the database
+    __tablename__ = "artworks"
 
-    # Abaixo definimos as colunas da tabela
-    # Cada atributo vira uma coluna no banco
+    # Below we define the table columns
+    # Each attribute becomes a column in the database
 
-    # ID único para cada obra
-    # primary_key=True → identifica a linha de forma única
-    # index=True → cria um índice para buscas mais rápidas
+    # Unique ID for each artwork
+    # primary_key=True → uniquely identifies the row
+    # index=True → creates an index for faster searches
     id = Column(Integer, primary_key=True, index=True)
 
-    # Nome da obra (obrigatório)
-    # nullable=False → não pode ficar vazio
-    nome = Column(String, nullable=False)
+    # Name of the artwork (required)
+    # nullable=False → cannot be empty
+    name = Column(String, nullable=False)
 
-    # Nome da coleção (pode ser vazio)
-    colecao = Column(String)
+    # Name of the collection (optional)
+    collection = Column(String)
 
-    # Ano de criação da obra (pode ser vazio)
-    ano = Column(Integer)
+    # Year the artwork was created (optional)
+    year = Column(Integer)
 
-    # Categoria da obra (por exemplo: "abstrato", "paisagem", etc)
-    categoria = Column(String)
+    # Category of the artwork (e.g., "abstract", "landscape", etc.)
+    category = Column(String)
 
-    # Define se a obra está arquivada (invisível para o público)
-    # Por padrão, começa como False (visível)
-    arquivado = Column(Boolean, default=False)
+    # Indicates if the artwork is archived (invisible to the public)
+    # Default is False (visible)
+    archived = Column(Boolean, default=False)
 
-    # Caminho da imagem (URL ou nome do arquivo salvo)
-    imagem_url = Column(String)
-
-
+    # Image path (URL or saved file name)
+    image_url = Column(String)
