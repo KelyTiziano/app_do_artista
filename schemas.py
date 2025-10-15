@@ -1,25 +1,23 @@
 from pydantic import BaseModel
 from typing import Optional
 
-from pydantic import BaseModel
+# Schema to create an artwork
+class ArtworkCreate(BaseModel):
+    name: str            # Name of the artwork (required)
+    collection: str      # Name of the collection (required)
+    year: int            # Year of creation (required)
+    category: str        # Category of the artwork (required)
+    image_url: str       # Path or URL of the image (required)
 
-# Schema para criar uma obra
-class ObraCreate(BaseModel):
-    nome: str            # Nome da obra (obrigatório)
-    colecao: str         # Nome da coleção (obrigatório)
-    ano: int             # Ano da criação (obrigatório)
-    categoria: str       # Categoria da obra (obrigatório)
-    imagem_url: str      # Caminho ou URL da imagem (obrigatório)
-
-# Schema para retornar uma obra
-class ObraRead(BaseModel):
+# Schema to return an artwork
+class ArtworkRead(BaseModel):
     id: int
-    nome: str
-    colecao: str
-    ano: int
-    categoria: str
-    arquivado: bool
-    imagem_url: str
+    name: str
+    collection: str
+    year: int
+    category: str
+    archived: bool
+    image_url: str
 
     class Config:
         orm_mode = True

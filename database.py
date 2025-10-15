@@ -1,47 +1,51 @@
-# Importa o módulo create_engine do SQLAlchemy, que cria a conexão com o banco
+# Import the create_engine function from SQLAlchemy.
+# This is used to create the connection to the database.
 from sqlalchemy import create_engine
 
-# Importa sessionmaker e declarative_base do SQLAlchemy
-# sessionmaker → cria sessões para interagir com o banco
-# declarative_base → base para criar os modelos (tabelas)
+# Import sessionmaker and declarative_base from SQLAlchemy.
+# sessionmaker → used to create sessions to interact with the database.
+# declarative_base → base class used to create models (tables).
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Define a URL do banco de dados
-# sqlite:///./artworks.db → banco SQLite chamado artworks.db na mesma pasta do projeto
+
+# Define the database URL
+# sqlite:///./obras.db → SQLite database named obras.db in the same project folder
 SQLALCHEMY_DATABASE_URL = "sqlite:///./obras.db"
 
-# Cria o engine de conexão com o banco
-# connect_args={"check_same_thread": False} é necessário apenas para SQLite
+# Create the database connection engine
+# connect_args={"check_same_thread": False} is required only when using SQLite
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
-# Cria uma "fábrica" de sessões
-# Cada vez que quisermos interagir com o banco, usamos SessionLocal()
+# Create a "session factory"
+# Every time we want to interact with the database, we use SessionLocal()
 SessionLocal = sessionmaker(
-    autocommit=False,   # garante que alterações só acontecem após commit()
-    autoflush=False,    # evita alterações salvas no automático (melhor controlar manualmente)
-    bind=engine         # conecta ao engine criado acima
+    autocommit=False,   # ensures changes only happen after commit()
+    autoflush=False,    # prevents automatic saving (gives more manual control)
+    bind=engine         # connects to the engine created above
 )
 
-# Cria a classe base para os modelos (tabelas)
-# Todos os modelos do projeto vão herdar dessa Base
+
+# Create the base class for the models (tables)
+# All models in the project will inherit from this Base
 Base = declarative_base()
 
 
 '''
 
-create_engine → conecta o Python ao banco.
+create_engine → connects Python to the database.
 
-sessionmaker → cria sessões que usamos para ler/escrever dados.
+sessionmaker → creates sessions that we use to read/write data.
 
-declarative_base → permite criar classes que se transformam em tabelas.
+declarative_base → allows us to create classes that will become database tables.
 
-SQLALCHEMY_DATABASE_URL → indica onde o banco será armazenado.
+SQLALCHEMY_DATABASE_URL → tells SQLAlchemy where the database is stored.
 
-SessionLocal → usamos ela para obter uma sessão sempre que precisarmos do banco.
+SessionLocal → we use it to get a session whenever we need the database.
 
----Sem flush, você só verá o id depois do commit.
+--- Without flush, you'll only see the ID after the commit.
 
-Com flush, o SQLAlchemy já envia para o banco e consegue gerar o id, mas ainda é possível voltar atrás antes do commit.
+With flush, SQLAlchemy already sends the data to the database 
+and generates the ID, but it's still possible to roll back before committing.
 '''

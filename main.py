@@ -2,91 +2,95 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 import models
 from database import SessionLocal, engine
-from schemas import ObraCreate, ObraRead  # Importa os schemas
+from schemas import ArtworkCreate, ArtworkRead
+ # Import the schemas
 
-# Cria as tabelas no banco, se ainda não existirem
-# Essa linha garante que todas as tabelas definidas no models.py
-# existam no banco de dados. Se não existirem, serão criadas.
+# Create tables in the database if they do not exist yet
+# This line ensures that all tables defined in models.py
+# exist in the database. If they do not exist, they will be created.
 models.Base.metadata.create_all(bind=engine)
 
-# Cria a aplicação FastAPI
-app = FastAPI(title="API Artista Visual")
+# Create the FastAPI application
+app = FastAPI(title="Visual Artist API")
 
-# DEPENDÊNCIA PARA O BANCO
 
-def obter_sessao_db():
-    """Cria uma sessão com o banco e garante que será fechada após uso"""
+# DATABASE DEPENDENCY
+
+def get_db_session():
+    """Creates a database session and ensures it will be closed after use"""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-# ROTA DE TESTE
+# TEST ROUTE
 
 @app.get("/")
-def rota_principal():
-    """Rota inicial de teste"""
-    return {"mensagem": "🚀 API do artista visual está funcionando!"}
+def main_route():
+    """Initial test route"""
+    return {"message": "🚀 Visual Artist API is working!"}
 
-# LISTAR TODAS AS OBRAS
 
-@app.get("/obras", response_model=list[ObraRead])
-def listar_todas_obras(db: Session = Depends(obter_sessao_db)):
-    """Retorna todas as obras cadastradas"""
-    obras = db.query(models.Artwork).all()
-    return obras
+# LIST ALL ARTWORKS
 
-# LISTAR OBRAS VISÍVEIS AO PÚBLICO
+@app.get("/artworks", response_model=list[ArtworkRead])
+def list_all_artworks(db: Session = Depends(get_db_session)):
+    """Returns all registered artworks"""
+    artworks = db.query(models.Artwork).all()
+    return artworks
 
-@app.get("/obras/visiveis", response_model=list[ObraRead])
-def listar_obras_visiveis(db: Session = Depends(obter_sessao_db)):
+# LIST ARTWORKS VISIBLE TO THE PUBLIC
+
+@app.get("/artworks/visible", response_model=list[ArtworkRead])
+def list_visible_artworks(db: Session = Depends(get_db_session)):
     """
-    Retorna apenas as obras que NÃO estão arquivadas (arquivado = False),
-    ou seja, visíveis ao público geral.
+    Returns only the artworks that are NOT archived (archived = False),
+    i.e., visible to the general public.
     """
-    obras_visiveis = db.query(models.Artwork).filter(models.Artwork.arquivado == False).all()
-    return obras_visiveis
+    visible_artworks = db.query(models.Artwork).filter(models.Artwork.arquivado == False).all()
+    return visible_artworks
 
-# ADICIONAR UMA NOVA OBRA
 
-@app.post("/obras", response_model=ObraRead)
-def cadastrar_obra(obra: ObraCreate, db: Session = Depends(obter_sessao_db)):
+# ADD A NEW ARTWORK
+
+@app.post("/artworks", response_model=ArtworkRead)
+def register_artwork(artwork: ArtworkCreate, db: Session = Depends(get_db_session)):
     """
-    Adiciona uma nova obra ao banco.
-    Recebe um JSON com todos os campos obrigatórios:
+    Adds a new artwork to the database.
+    Receives a JSON with all required fields:
     {
-        "nome": "Nome da obra",
-        "colecao": "Nome da coleção",
-        "ano": 2025,
-        "categoria": "Categoria",
-        "imagem_url": "caminho/da/imagem"
+        "name": "Name of the artwork",
+        "collection": "Name of the collection",
+        "year": 2025,
+        "category": "Category",
+        "image_url": "path/to/image"
     }
     """
 
-    nova_obra = models.Artwork(
-        nome=obra.nome,
-        colecao=obra.colecao,
-        ano=obra.ano,
-        categoria=obra.categoria,
-        imagem_url=obra.imagem_url
+    new_artwork = models.Artwork(
+        name=artwork.name,
+        collection=artwork.collection,
+        year=artwork.year,
+        category=artwork.category,
+        image_url=artwork.image_url
     )
-    db.add(nova_obra)
+    db.add(new_artwork)
     db.commit()
-    db.refresh(nova_obra)  # pega o ID gerado
-    return nova_obra
+    db.refresh(new_artwork)  # gets the generated ID
+    return new_artwork
 
-    # ARQUIVAR UMA OBRA
-@app.put("/obras/{id_obra}/arquivar", response_model=ObraRead)
-def arquivar_obra(id_obra: int, db: Session = Depends(obter_sessao_db)):
+    # ARCHIVE AN ARTWORK
+@app.put("/artworks/{artwork_id}/archive", response_model=ArtworkRead)
+def archive_artwork(artwork_id: int, db: Session = Depends(get_db_session)):
     """
-    Marca uma obra como arquivada (invisível para o público).
+    Marks an artwork as archived (invisible to the public).
     """
-    obra = db.query(models.Artwork).filter(models.Artwork.id == id_obra).first()
-    if not obra:
-        raise HTTPException(status_code=404, detail="Obra não encontrada")
+    artwork = db.query(models.Artwork).filter(models.Artwork.id == artwork_id).first()
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
     
-    obra.arquivado = True
+    artwork.archived = True
     db.commit()
-    db.refresh(obra)
-    return obra
+    db.refresh(artwork)
+    return artwork
