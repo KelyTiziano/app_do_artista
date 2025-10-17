@@ -1,18 +1,19 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 import models, schemas
+from models import Base
 from database import SessionLocal, engine
 from schemas import ArtworkCreate, ArtworkRead, CategoryRead
 from typing import List
- 
-# Create the FastAPI application
-app = FastAPI()
 
 # Create tables in the database if they do not exist yet
 # This line ensures that all tables defined in models.py
 # exist in the database. If they do not exist, they will be created.
 models.Base.metadata.create_all(bind=engine)
 
+ 
+# Create the FastAPI application
+app = FastAPI()
 
 # DATABASE DEPENDENCY
 

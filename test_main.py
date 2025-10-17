@@ -1,13 +1,21 @@
-# test_main.py
-# Automated tests for the project_site Visual Artist API
-# Uses pytest and FastAPI's TestClient
-
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from main import app, get_db_session  # Import the FastAPI app and DB dependency
-from database import Base
+from database import Base, engine
 import models
+import pytest
+
+@pytest.fixture(autouse=True)
+def setup_and_teardown_db():
+    # search all tables before each test
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    yield
+    # optional: clean after test
+    Base.metadata.drop_all(bind=engine)
+
+
 
 # Temporary file
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test_db.db"  
@@ -97,10 +105,10 @@ def test_list_artworks():
     assert response.status_code == 200
     json_response = response.json()
     assert isinstance(json_response, list)
-    assert len(json_response) >= 1
+    assert len(json_response) 0 >= 1
 
 # test archiving an artwork
-def test_archive_artwork():
+def test_archived_artwork():
 
     #create categories for the artwork
     db = TestingSessionLocal()

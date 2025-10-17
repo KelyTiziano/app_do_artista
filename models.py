@@ -6,12 +6,13 @@ from sqlalchemy import Column, Integer, String, Boolean, Table, ForeignKey
 # All models (tables) inherit from this Base
 from database import Base
 from sqlalchemy.orm import relationship
+from database import engine
 
 #Association table between artworks and categories
 artwork_categories = Table(
     "artwork_categories",
     Base.metadata,
-    Column("artwork_id", ForeignKey("artwork.id"), primary_key=True),
+    Column("artwork_id", ForeignKey("artworks.id"), primary_key=True),
     Column("category_id", ForeignKey("categories.id"), primary_key=True)
 )
 
@@ -58,3 +59,4 @@ class Artwork(Base):
         secondary=artwork_categories,
         backref = "artworks" # correction from obras.id to arwork.id, stop mistake from foreing key inexistent
     )
+
